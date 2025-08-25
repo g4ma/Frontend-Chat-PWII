@@ -1,7 +1,10 @@
 * {
   margin: 0;
 }
-.main {
-  min-height: 100vh;
-  background-color: blue;
+
+nav {
+  display: flex;
+  background-color: grey;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
 }
