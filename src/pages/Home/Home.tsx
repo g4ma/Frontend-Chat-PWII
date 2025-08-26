@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ButtonGroup, MainDisplay } from "./Home.style";
-import { Logo, NavigateButton } from "../../components";
+import { ButtonGroup } from "./Home.style";
+import { Logo, MainDisplay, NavigateButton } from "../../components";
 
 export function Home() {
   const navigate = useNavigate();

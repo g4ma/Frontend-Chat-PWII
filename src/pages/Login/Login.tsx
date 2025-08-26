@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { LoginForm } from "../../components/Forms/LoginForm/LoginForm";
 import { useNavigate } from "react-router-dom";
-import { MainDisplay } from "./Login.style";
-import { Logo } from "../../components";
+import { Logo, MainDisplay } from "../../components";
 
 export function Login() {
   

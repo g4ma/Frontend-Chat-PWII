@@ -1,12 +1,11 @@
+import { MainDisplay, Logo } from "../../components";
 import { CreateAccountForm } from "../../components/Forms/CreateAccountForm/CreateAccountForm";
 
 export function CreateAccount() {
   return (
-    <main>
-      <div>
-        <h2>Criar conta</h2>
+      <MainDisplay>
+        <Logo fontSize="3rem" iconSize="75"/>
         <CreateAccountForm />
-      </div>
-    </main>
+      </MainDisplay>
   );
 }

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Form } from "../Form/Form";
 import { Input } from "../Input/Input";
+import Button from "../Button/Button";
 
 export function CreateAccountForm() {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ export function CreateAccountForm() {
       <Input name="name" placeholder="Insira seu nome" />
       <Input name="username" placeholder="Insira seu nome de usuário" />
       <Input name="password" placeholder="Insira sua senha" />
+      <Button type="submit">Criar Conta</Button>
     </Form>
   );
 }
