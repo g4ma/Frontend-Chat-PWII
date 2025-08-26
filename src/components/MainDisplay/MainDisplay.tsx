@@ -1,3 +1,5 @@
+import { MainDiv } from "./MainDisplay.style";
+
 interface MainDisplayProps {
     children: React.ReactNode;
 }
@@ -5,9 +7,9 @@ interface MainDisplayProps {
 export default function MainDisplay({ children }: MainDisplayProps) {
 
     return (
-        <MainDisplay>
+        <MainDiv>
             {children}
-        </MainDisplay>
+        </MainDiv>
     )  ;
 
 }
