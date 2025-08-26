@@ -7,14 +7,20 @@ import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.s
 interface NewChatSelectorProps {
   currentUserId: number;
   onSelect: (user: User) => void;
+  onToggleOpen: (open: boolean) => void;
 }
 
 export default function NewChatSelector({
   currentUserId,
   onSelect,
+  onToggleOpen,
 }: NewChatSelectorProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    onToggleOpen(open); // 👈 avisa o pai
+  }, [open, onToggleOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +49,7 @@ export default function NewChatSelector({
   return (
     <div>
       <NewChatButton onClick={() => setOpen((prev) => !prev)}>
-        + Nova Conversa
+        {open ? "Voltar" : "+ Nova Conversa"}
       </NewChatButton>
 
       <List className={open ? "open" : ""}>

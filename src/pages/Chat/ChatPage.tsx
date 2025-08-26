@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
 import { ChatArea, ChatDisplay, ChatSidebar, Logo, StatusDisplay } from "../../components";
 import SmallDot from "../../assets/smalldot";
-import { StatusTitle } from "./ChatPage.style";
+import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
 
 const socket: Socket = io("http://localhost:3000");
 
@@ -21,6 +21,7 @@ export default function ChatPage() {
   const [connected, setConnected] = useState(socket.connected);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
+  const [showNewChat, setShowNewChat] = useState(false);
 
   useOfflineQueue(socket);
 
@@ -63,11 +64,14 @@ export default function ChatPage() {
             <NewChatSelector
               currentUserId={userId}
               onSelect={setSelectedContact}
+              onToggleOpen={setShowNewChat}
             />
-            <ContactList
-              currentUserId={userId}
-              selectContact={setSelectedContact}
-            />
+            <ContactListWrapper $hidden={showNewChat}>
+              <ContactList
+                currentUserId={userId}
+                selectContact={setSelectedContact}
+              />
+            </ContactListWrapper>
           </ChatSidebar>
           <ChatArea>
             {selectedContact ? (
