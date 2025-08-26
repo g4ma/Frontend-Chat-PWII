@@ -51,9 +51,9 @@ export default function ChatPage() {
   }, [navigate]);
 
   useEffect(() => {
-    async function subscribeToPushNotification(){
+    async function subscribeToPushNotification(receiverId: number){
       if ("serviceWorker" in navigator){
-        const registration = await navigator.serviceWorker.register('../../../public/sw.js')
+        const registration = await navigator.serviceWorker.register('/sw.js')
         
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
@@ -62,14 +62,19 @@ export default function ChatPage() {
 
         await fetch("http://localhost:3000/notification/subscribe", {
           method: "POST",
-          body: JSON.stringify(subscription),
+          body: JSON.stringify({
+            subscription,
+            receiverId,
+          }),
           headers: { "Content-Type": "application/json" },
         })
       }
     }
 
-    subscribeToPushNotification();
-  }, [])
+    if (userId !== null){
+      subscribeToPushNotification(userId);
+    }
+  }, [userId])
   
 
   Notification.requestPermission().then((result) => {
