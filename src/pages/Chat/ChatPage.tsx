@@ -76,6 +76,17 @@ export default function ChatPage() {
     }
   }, [userId])
   
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data?.type === "NEW_PUSH_DATA") {
+          const msg = event.data.payload;
+          setSelectedContact({name: "", username: "", password: "", id: msg.chatId})
+        }
+      });
+    }
+  }, []);
+  
 
   Notification.requestPermission().then((result) => {
     console.log(result);
