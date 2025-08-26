@@ -17,10 +17,27 @@ export default function ChatWindow({
   currentUserId,
   contactId,
 }: ChatWindowProps) {
-  
+
   const [messages, setMessages] = useState<Message[]>(getCachedMessages());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+
+  function formatDate(fullDate: Date | string) {
+    if (!fullDate) return "";
+
+    const date = new Date(fullDate);
+    const formattedDate = `${date.getHours().toString().padStart(2, '0')}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')} ${date.getDate().toString().padStart(2, '0')}/${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+
+    return formattedDate;
+
+  }
 
   // Pega histórico de mensagens ao mudar de contato
   useEffect(() => {
@@ -90,7 +107,10 @@ export default function ChatWindow({
       <MessagesArea ref={messagesAreaRef}>
         {messages.map((m, i) => (
           <MessageBubble key={i} isSent={m.senderId === currentUserId}>
-            {m.text}
+            <p>{m.text}</p>
+            <span>
+              {formatDate(m.createdAt ?? new Date())}
+            </span>
           </MessageBubble>
         ))}
         <div ref={messagesEndRef} />

@@ -22,13 +22,22 @@ export const MessagesArea = styled.div`
 `;
 
 export const MessageBubble = styled.div<{ isSent: boolean }>`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     align-self: ${(props) => (props.isSent ? "flex-end" : "flex-start")};
     background-color: ${(props) => (props.isSent ? "#898989" : "#cfcfcfff")};
     padding: 10px 15px;
     border-radius: ${(props) => (props.isSent ? "10px 0px 10px 10px" : "0px 10px 10px 10px")};
     max-width: 60%;
     word-wrap: break-word;
-    color: #1f1f1f;
+    color: #111111ff;
     font-size: .9rem;
+
+    span {
+        font-size: 0.55rem;
+        color: #353535ff;
+        text-align: right;
+    }
 
 `;
