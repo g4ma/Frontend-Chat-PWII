@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
-
+import { useEffect } from "react";
+import { useMessages } from "../../../context/UseMessageContext";
 import { MessageInput } from "../MessageInput/MissageInput";
-import { cacheMessages, getCachedMessages } from "../../../utils/storage";
 import type { Message } from "../../../interfaces/Message";
+import type { Socket } from "socket.io-client";
 
 interface ChatWindowProps {
   socket: Socket;
@@ -16,59 +15,35 @@ export default function ChatWindow({
   currentUserId,
   contactId,
 }: ChatWindowProps) {
-  const [messages, setMessages] = useState<Message[]>(getCachedMessages());
+  const { messages, addMessage } = useMessages();
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `http://localhost:3000/messages/history/${currentUserId}/${contactId}`
         );
-
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar mensagens: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        setMessages(data);
-        cacheMessages(data);
+        const data: Message[] = await res.json();
+        data.forEach(addMessage);
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchMessages();
-  }, [currentUserId, contactId]);
+  }, [currentUserId, contactId, addMessage]);
 
-  useEffect(() => {
-    function handleReceive(message: Message) {
-      if (
-        (message.senderId === contactId &&
-          message.receiverId === currentUserId) ||
-        (message.senderId === currentUserId && message.receiverId === contactId)
-      ) {
-        setMessages((prev) => {
-          const updated = [...prev, message];
-          cacheMessages(updated);
-          return updated;
-        });
-      }
-    }
-
-    socket.on("receiveMessage", handleReceive);
-    return () => {
-      socket.off("receiveMessage", handleReceive);
-    };
-  }, [socket, currentUserId, contactId]);
+  const chatMessages = messages.filter(
+    (m) =>
+      (m.senderId === currentUserId && m.receiverId === contactId) ||
+      (m.senderId === contactId && m.receiverId === currentUserId)
+  );
 
   return (
     <div>
       <div>
-        {messages.map((m, i) => (
+        {chatMessages.map((m, i) => (
           <p key={i}>
-            {m.senderId === currentUserId ? "eu: " : "você: "}
-            {m.text}
+            {m.senderId === currentUserId ? "eu: " : "você: "} {m.text}
           </p>
         ))}
       </div>
@@ -77,6 +52,7 @@ export default function ChatWindow({
         socket={socket}
         senderId={currentUserId}
         receiverId={contactId}
+        onSendMessage={addMessage}
       />
     </div>
   );
