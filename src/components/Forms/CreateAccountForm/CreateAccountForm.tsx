@@ -41,7 +41,7 @@ export function CreateAccountForm() {
     <Form handleSubmit={handleSubmit}>
       <Input name="name" placeholder="Insira seu nome" />
       <Input name="username" placeholder="Insira seu nome de usuário" />
-      <Input name="password" placeholder="Insira sua senha" />
+      <Input name="password" placeholder="Insira sua senha" type="password" />
       <Button type="submit">Criar Conta</Button>
     </Form>
   );
