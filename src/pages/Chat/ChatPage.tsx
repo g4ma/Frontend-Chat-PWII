@@ -81,12 +81,17 @@ export default function ChatPage() {
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data?.type === "NEW_PUSH_DATA") {
           const msg = event.data.payload;
-          setSelectedContact({name: "", username: "", password: "", id: msg.chatId})
+          setSelectedContact({ name: "", username: "", password: "", id: msg.chatId });
+        }
+      });
+  
+      navigator.serviceWorker.ready.then(reg => {
+        if (reg.active) {
+          reg.active.postMessage({ type: "REQUEST_NOTIFICATION_DATA" });
         }
       });
     }
   }, []);
-  
 
   Notification.requestPermission().then((result) => {
     console.log(result);

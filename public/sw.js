@@ -1,24 +1,19 @@
+let lastNotificationData = null;
+
 self.addEventListener('push', event => {
   const data = event.data?.json() || {};
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(windowClients => {
-      
-      for (const client of windowClients) {
-        client.postMessage({
-          type: "NEW_PUSH_DATA",
-          payload: data
-        });
-      }
-
-      // Verifica se alguma aba está focada
       const isFocused = windowClients.some(client => client.focused);
 
       if (!isFocused) {
+        lastNotificationData = data;
+        
         return self.registration.showNotification(data.title || "New message", {
           body: data.body || "You have a new chat message",
           icon: "/icon.png",
-          data: data.url || "/"
+          data
         });
       }
     })
@@ -27,19 +22,36 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+  const notificationData = event.notification.data;
+  lastNotificationData = notificationData;
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(windowClients => {
       for (const client of windowClients) {
-        // se já tiver uma aba com a URL, só foca nela
-        if (client.url === event.notification.data && 'focus' in client) {
+        if (client.url === notificationData.url && 'focus' in client) {
+          client.postMessage({
+            type: "NEW_PUSH_DATA",
+            payload: notificationData
+          });
+          lastNotificationData = null;
           return client.focus();
         }
       }
-      // se não tiver nenhuma aberta, aí sim abre uma nova
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data);
+        return clients.openWindow(notificationData.url);
       }
     })
   );
+});
+
+self.addEventListener("message", event => {
+  if (event.data && event.data.type === "REQUEST_NOTIFICATION_DATA") {
+    if (lastNotificationData) {
+      event.source.postMessage({
+        type: "NEW_PUSH_DATA",
+        payload: lastNotificationData
+      });
+      lastNotificationData = null;
+    }
+  }
 });
