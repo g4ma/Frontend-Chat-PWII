@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "../../interfaces/User";
+import { List, NewChatButton } from "./NewChatSelector.style";
+import ProfileIcon from "../../assets/profileIcon";
 
 interface NewChatSelectorProps {
   currentUserId: number;
@@ -39,23 +41,25 @@ export default function NewChatSelector({
 
   return (
     <div>
-      <button onClick={() => setOpen((prev) => !prev)}>+</button>
-      {open && (
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              <button
-                onClick={() => {
-                  onSelect(user);
-                  setOpen(false);
-                }}
-              >
-                {user.name} ({user.username})
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <NewChatButton onClick={() => setOpen((prev) => !prev)}>
+        + Nova Conversa
+      </NewChatButton>
+
+      <List className={open ? "open" : ""}>
+        {users.map((user) => (
+          <li key={user.id}>
+            <button
+              onClick={() => {
+                onSelect(user);
+                setOpen(false);
+              }}
+            >
+              <ProfileIcon size="25" />
+              {user.name} ({user.username})
+            </button>
+          </li>
+        ))}
+      </List>
     </div>
   );
 }

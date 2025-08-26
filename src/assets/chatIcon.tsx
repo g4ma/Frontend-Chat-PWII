@@ -2,8 +2,7 @@ import * as React from "react";
 
 type Props = {
   size?: string;
-} & React.SVGProps<SVGSVGElement>; // inclui props padrão do <svg>
-
+} & React.SVGProps<SVGSVGElement>;
 
 const ChatIcon: React.FC<Props> = ({ size, ...props }) => (
   <svg

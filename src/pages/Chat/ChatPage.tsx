@@ -9,6 +9,8 @@ import ChatWindow from "../../components/Chat/ChatWindow/ChatWindow";
 import ContactList from "../../components/ContactList/ContactList";
 import { useNavigate } from "react-router-dom";
 import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
+import { ChatArea, ChatDisplay, ChatSidebar, Logo } from "../../components";
+import { StatusTitle } from "./ChatPage.style";
 
 const socket: Socket = io("http://localhost:3000");
 
@@ -38,28 +40,31 @@ export default function ChatPage() {
       {userId === null ? (
         <div>loading</div>
       ) : (
-        <div style={{ display: "flex" }}>
-          <div style={{ width: "200px" }}>
-            <h3>{connected ? "Online" : "Offline"}</h3>
-            <ContactList
-              currentUserId={userId}
-              selectContact={setSelectedContact}
-            />
+        <ChatDisplay>
+          <ChatSidebar>
+            <StatusTitle>{connected ? "Online" : "Offline"}</StatusTitle>
             <NewChatSelector
               currentUserId={userId}
               onSelect={setSelectedContact}
             />
-          </div>
-          <div style={{ flex: 1 }}>
-            {selectedContact && (
+            <ContactList
+              currentUserId={userId}
+              selectContact={setSelectedContact}
+            />
+          </ChatSidebar>
+          <ChatArea>
+            {selectedContact ? (
               <ChatWindow
                 socket={socket}
                 currentUserId={userId}
                 contactId={selectedContact.id}
               />
+            ) : (
+              <Logo fontSize="3rem" iconSize="75" />
             )}
-          </div>
-        </div>
+          </ChatArea>
+
+        </ChatDisplay>
       )}
     </>
   );
