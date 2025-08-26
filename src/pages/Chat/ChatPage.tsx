@@ -33,6 +33,33 @@ export default function ChatPage() {
     socket.on("disconnect", () => setConnected(false));
   }, [navigate]);
 
+  useEffect(() => {
+    function handleNotification(message: any) {
+      console.log(message)
+      if (message.receiverId === userId) {
+        if (!selectedContact || message.senderId !== selectedContact.id) {
+          if (Notification.permission === "granted") {
+            const notification = new Notification("Nova mensagem", {
+              body: message.text,
+              icon: "/chat-icon.png"
+            });
+            notification.addEventListener("click", () => setSelectedContact({id: message.senderId, name:"", username:"", password:""}))
+          }
+        }
+      }
+    }
+  
+    socket.on("receiveMessage", handleNotification);
+    return () => {
+      socket.off("receiveMessage", handleNotification);
+    };
+  }, [socket, userId, selectedContact]);
+  
+
+  Notification.requestPermission().then((result) => {
+    console.log(result);
+  });
+
   return (
     <>
       {userId === null ? (
