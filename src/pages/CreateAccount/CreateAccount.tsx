@@ -1,5 +1,4 @@
 import { CreateAccountForm } from "../../components/Forms/CreateAccountForm/CreateAccountForm";
-import "../Home/Home.css";
 
 export function CreateAccount() {
   return (

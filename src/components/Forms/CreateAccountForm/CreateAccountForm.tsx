@@ -38,9 +38,9 @@ export function CreateAccountForm() {
 
   return (
     <Form handleSubmit={handleSubmit}>
-      <Input name="name" placeholder="insira seu nome" />
-      <Input name="username" placeholder="insira seu nome de usuário" />
-      <Input name="password" placeholder="insira sua senha" />
+      <Input name="name" placeholder="Insira seu nome" />
+      <Input name="username" placeholder="Insira seu nome de usuário" />
+      <Input name="password" placeholder="Insira sua senha" />
     </Form>
   );
 }
