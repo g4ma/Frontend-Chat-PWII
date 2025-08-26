@@ -1,8 +1,11 @@
+import { TextInput } from "./Input.style";
+
 interface InputProps {
   placeholder: string;
   name: string;
+  type?: string;
 }
 
-export function Input({ name, placeholder }: InputProps) {
-  return <input type="text" name={name} placeholder={placeholder} />;
+export function Input({ name, placeholder, type }: InputProps) {
+  return <TextInput type={type || "text"} name={name} placeholder={placeholder} />;
 }

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { LoginForm } from "../../components/Forms/LoginForm/LoginForm";
 import { useNavigate } from "react-router-dom";
+import { MainDisplay } from "./Login.style";
+import { Logo } from "../../components";
 
 export function Login() {
   
@@ -12,15 +14,12 @@ export function Login() {
       navigate("/chat", { replace: true });
     }
   }, [navigate]);
-
-  console.log("Renderizando Login");
   
   return (
-    <main>
-      <div>
-        <h2>Fazer Login</h2>
+    <MainDisplay>
+        <title>Login - Chatbot UI</title>
+        <Logo fontSize="3rem" iconSize="75"/>
         <LoginForm />
-      </div>
-    </main>
+    </MainDisplay>
   );
 }

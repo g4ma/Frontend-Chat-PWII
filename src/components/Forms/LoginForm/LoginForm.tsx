@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Form } from "../Form/Form";
 import { Input } from "../Input/Input";
+import Button from "../Button/Button";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -37,8 +38,9 @@ export function LoginForm() {
 
   return (
     <Form handleSubmit={handleSubmit}>
-      <Input name="username" placeholder="insira seu nome de usuário" />
-      <Input name="password" placeholder="insira sua senha" />
+      <Input name="username" placeholder="Insira seu nome de usuário" />
+      <Input name="password" placeholder="Insira sua senha" type="password" />
+      <Button type="submit">Entrar</Button>
     </Form>
   );
 }
