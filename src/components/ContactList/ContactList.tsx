@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import type { User } from "../../interfaces/User";
+import { ContactChatsContainer, ContactListContainer, NoContactsMessage, SearchBar } from "./ContactList.style";
+import ProfileIcon from "../../assets/profileIcon";
+import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
 
 interface ContactListProps {
   currentUserId: number;
@@ -10,8 +13,10 @@ export default function ContactList({
   currentUserId,
   selectContact,
 }: ContactListProps) {
+
   const [contacts, setContacts] = useState<User[]>([]);
-  const [search, setSearch] = useState(""); // estado da busca
+
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function getMyContact() {
@@ -36,35 +41,35 @@ export default function ContactList({
     }
     getMyContact();
   }, [currentUserId]);
+
+  const normalizedSearch = search.replaceAll("@", "").toLowerCase();
+
   const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(search.toLowerCase()) ||
-    contact.username.toLowerCase().includes(search.toLowerCase())
+    contact.name.toLowerCase().includes(normalizedSearch) ||
+    contact.username.toLowerCase().includes(normalizedSearch)
   );
 
   return (
-    <div>
-      <input
+    <ContactListContainer>
+      <SearchBar
         type="text"
-        placeholder="Buscar contatos..."
+        placeholder="Buscar conversas..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {filteredContacts.map((contact) => (
-        <div
-          key={contact.id}
-          onClick={() => selectContact(contact)}
-          style={{
-            padding: "8px",
-            borderBottom: "1px solid #444",
-            cursor: "pointer",
-          }}
-        >
-          {contact.name} ({contact.username})
-        </div>
-      ))}
-
-      {filteredContacts.length === 0 && <p>Nenhum contato encontrado.</p>}
-    </div>
+      <ContactChatsContainer>
+        {filteredContacts.map((contact) => (
+          <ContactButton
+            key={contact.id}
+            onClick={() => selectContact(contact)}
+          >
+            <ProfileIcon size="25" />
+            {contact.name} <ContactUsername>(@{contact.username})</ContactUsername>
+          </ContactButton>
+        ))}
+        {filteredContacts.length === 0 && <NoContactsMessage>Nenhuma conversa encontrada</NoContactsMessage>}
+      </ContactChatsContainer>
+    </ContactListContainer>
   );
 }

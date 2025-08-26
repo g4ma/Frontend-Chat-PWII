@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { User } from "../../interfaces/User";
-import { List, NewChatButton } from "./NewChatSelector.style";
 import ProfileIcon from "../../assets/profileIcon";
+import { List, NewChatButton } from "./NewChatSelector.style";
+import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
 
 interface NewChatSelectorProps {
   currentUserId: number;
@@ -48,15 +49,15 @@ export default function NewChatSelector({
       <List className={open ? "open" : ""}>
         {users.map((user) => (
           <li key={user.id}>
-            <button
+            <ContactButton
               onClick={() => {
                 onSelect(user);
                 setOpen(false);
               }}
             >
               <ProfileIcon size="25" />
-              {user.name} ({user.username})
-            </button>
+              {user.name} <ContactUsername>(@{user.username})</ContactUsername>
+            </ContactButton>
           </li>
         ))}
       </List>

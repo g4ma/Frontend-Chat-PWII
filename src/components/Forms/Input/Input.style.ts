@@ -9,7 +9,7 @@ export const TextInput = styled.input`
     width: 350px;
     height: 35px;
     padding: 0 10px;
-    font-size: 1rem;
+    font-size: .9rem;
     font-weight: 400;
 
     &:focus {

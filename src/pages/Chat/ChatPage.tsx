@@ -9,7 +9,8 @@ import ChatWindow from "../../components/Chat/ChatWindow/ChatWindow";
 import ContactList from "../../components/ContactList/ContactList";
 import { useNavigate } from "react-router-dom";
 import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
-import { ChatArea, ChatDisplay, ChatSidebar, Logo } from "../../components";
+import { ChatArea, ChatDisplay, ChatSidebar, Logo, StatusDisplay } from "../../components";
+import SmallDot from "../../assets/smalldot";
 import { StatusTitle } from "./ChatPage.style";
 
 const socket: Socket = io("http://localhost:3000");
@@ -42,7 +43,23 @@ export default function ChatPage() {
       ) : (
         <ChatDisplay>
           <ChatSidebar>
-            <StatusTitle>{connected ? "Online" : "Offline"}</StatusTitle>
+            <StatusDisplay>
+              {connected ? (
+                <>
+                  <StatusTitle>
+                    Online
+                  </StatusTitle>
+                  <SmallDot size="13" color="#4caf50" />
+                </>
+              ) : (
+                <>
+                  <StatusTitle>
+                    Offline
+                  </StatusTitle>
+                  <SmallDot size="13" color="#918f8fff" />
+                </>
+              )}
+            </StatusDisplay>
             <NewChatSelector
               currentUserId={userId}
               onSelect={setSelectedContact}
@@ -60,7 +77,7 @@ export default function ChatPage() {
                 contactId={selectedContact.id}
               />
             ) : (
-              <Logo fontSize="3rem" iconSize="75" />
+              <Logo fontSize="2rem" iconSize="50" />
             )}
           </ChatArea>
 
