@@ -7,4 +7,5 @@ export const MainDiv = styled.div`
     align-items: center;
     justify-content: center; 
     height: 100vh;
+    box-sizing: border-box;
 `;

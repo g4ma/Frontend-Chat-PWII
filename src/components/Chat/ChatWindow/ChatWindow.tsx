@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
 
-import { MessageInput } from "../MessageInput/MissageInput";
+import { MessageInput } from "../MessageInput/MessageInput";
 import { cacheMessages, getCachedMessages } from "../../../utils/storage";
 import type { Message } from "../../../interfaces/Message";
+import { MainDiv, MessageBubble, MessagesArea } from "./ChatWindow.style";
 
 interface ChatWindowProps {
   socket: Socket;
@@ -16,8 +17,12 @@ export default function ChatWindow({
   currentUserId,
   contactId,
 }: ChatWindowProps) {
+  
   const [messages, setMessages] = useState<Message[]>(getCachedMessages());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
 
+  // Pega histórico de mensagens ao mudar de contato
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -29,7 +34,7 @@ export default function ChatWindow({
           throw new Error(`Erro ao buscar mensagens: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data: Message[] = await response.json();
 
         setMessages(data);
         cacheMessages(data);
@@ -41,12 +46,14 @@ export default function ChatWindow({
     fetchMessages();
   }, [currentUserId, contactId]);
 
+  // Recebe novas mensagens via socket
   useEffect(() => {
-    function handleReceive(message: Message) {
+    const handleReceive = (message: Message) => {
       if (
         (message.senderId === contactId &&
           message.receiverId === currentUserId) ||
-        (message.senderId === currentUserId && message.receiverId === contactId)
+        (message.senderId === currentUserId &&
+          message.receiverId === contactId)
       ) {
         setMessages((prev) => {
           const updated = [...prev, message];
@@ -54,30 +61,46 @@ export default function ChatWindow({
           return updated;
         });
       }
-    }
+    };
 
     socket.on("receiveMessage", handleReceive);
+
     return () => {
       socket.off("receiveMessage", handleReceive);
     };
   }, [socket, currentUserId, contactId]);
 
+  // Scroll automático
+  useEffect(() => {
+    const messagesArea = messagesAreaRef.current;
+    if (!messagesArea || !messagesEndRef.current) return;
+
+    // Verifica se está quase no final
+    const nearBottom =
+      messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight <
+      50;
+
+    if (nearBottom) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   return (
-    <div>
-      <div>
+    <MainDiv>
+      <MessagesArea ref={messagesAreaRef}>
         {messages.map((m, i) => (
-          <p key={i}>
-            {m.senderId === currentUserId ? "eu: " : "você: "}
+          <MessageBubble key={i} isSent={m.senderId === currentUserId}>
             {m.text}
-          </p>
+          </MessageBubble>
         ))}
-      </div>
+        <div ref={messagesEndRef} />
+      </MessagesArea>
 
       <MessageInput
         socket={socket}
         senderId={currentUserId}
         receiverId={contactId}
       />
-    </div>
+    </MainDiv>
   );
 }

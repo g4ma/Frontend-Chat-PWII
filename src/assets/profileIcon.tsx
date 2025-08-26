@@ -4,7 +4,7 @@ type Props = {
   size?: string;
 } & React.SVGProps<SVGSVGElement>;
 
-const ProfileIcon: React.FC<Props> = ({ size, ...props }) => (
+const ProfileIcon: React.FC<Props> = ({ size }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlSpace="preserve"

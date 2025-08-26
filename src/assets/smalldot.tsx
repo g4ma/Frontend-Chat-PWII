@@ -5,7 +5,7 @@ type Props = {
     size?: string;
 } & React.SVGProps<SVGSVGElement>;
 
-const SmallDot: React.FC<Props> = ({ size, color, ...props }) => (
+const SmallDot: React.FC<Props> = ({ size, color }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         xmlSpace="preserve"
