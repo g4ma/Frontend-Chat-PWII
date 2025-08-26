@@ -11,6 +11,23 @@ import { useNavigate } from "react-router-dom";
 import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
 
 const socket: Socket = io("http://localhost:3000");
+const PUBLIC_VAPID = "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg"
+  
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -34,26 +51,25 @@ export default function ChatPage() {
   }, [navigate]);
 
   useEffect(() => {
-    function handleNotification(message: any) {
-      console.log(message)
-      if (message.receiverId === userId) {
-        if (!selectedContact || message.senderId !== selectedContact.id) {
-          if (Notification.permission === "granted") {
-            const notification = new Notification("Nova mensagem", {
-              body: message.text,
-              icon: "/chat-icon.png"
-            });
-            notification.addEventListener("click", () => setSelectedContact({id: message.senderId, name:"", username:"", password:""}))
-          }
-        }
+    async function subscribeToPushNotification(){
+      if ("serviceWorker" in navigator){
+        const registration = await navigator.serviceWorker.register('../../../public/sw.js')
+        
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
+        })
+
+        await fetch("http://localhost:3000/notification/subscribe", {
+          method: "POST",
+          body: JSON.stringify(subscription),
+          headers: { "Content-Type": "application/json" },
+        })
       }
     }
-  
-    socket.on("receiveMessage", handleNotification);
-    return () => {
-      socket.off("receiveMessage", handleNotification);
-    };
-  }, [socket, userId, selectedContact]);
+
+    subscribeToPushNotification();
+  }, [])
   
 
   Notification.requestPermission().then((result) => {
