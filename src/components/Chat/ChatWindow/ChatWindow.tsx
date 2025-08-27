@@ -3,6 +3,7 @@ import { useMessages } from "../../../context/UseMessageContext";
 import { MessageInput } from "../MessageInput/MissageInput";
 import type { Message } from "../../../interfaces/Message";
 import type { Socket } from "socket.io-client";
+import { cacheMessages, getCachedMessages } from "../../../utils/storage";
 
 interface ChatWindowProps {
   socket: Socket;
@@ -24,11 +25,17 @@ export default function ChatWindow({
           `http://localhost:3000/messages/history/${currentUserId}/${contactId}`
         );
         const data: Message[] = await res.json();
+
         data.forEach(addMessage);
+
+        cacheMessages(data);
       } catch (err) {
-        console.error(err);
+        console.warn("Falha ao buscar mensagens. Carregando do cache...");
+        const cached = getCachedMessages();
+        cached.forEach(addMessage);
       }
     };
+
     fetchMessages();
   }, [currentUserId, contactId, addMessage]);
 

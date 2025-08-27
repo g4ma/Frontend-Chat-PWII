@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { User } from "../../interfaces/User";
+import { getContacts, saveContacts } from "../../utils/storage";
 
 interface ContactListProps {
   currentUserId: number;
@@ -13,33 +14,45 @@ export default function ContactList({
   const [contacts, setContacts] = useState<User[]>([]);
 
   useEffect(() => {
-    console.log(currentUserId);
     async function getMyContact() {
-      const response = await fetch(
-        `http://localhost:3000/messages/contacts/${currentUserId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
+      try {
+        const response = await fetch(
+          `http://localhost:3000/messages/contacts/${currentUserId}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erro na requisição: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Erro na requisição: ${response.status}`);
+        const data: User[] = await response.json();
+        setContacts(data);
+
+        saveContacts(currentUserId, data);
+      } catch {
+        console.warn(
+          "Sem conexão com o servidor, carregando contatos offline..."
+        );
+        const storedContacts = getContacts(currentUserId);
+        if (storedContacts.length > 0) {
+          setContacts(storedContacts);
+        }
       }
-
-      const data: User[] = await response.json();
-      setContacts(data);
     }
+
     getMyContact();
   }, [currentUserId]);
 
   return (
     <div>
-      {contacts.map((contact) => (
-        <div key={contact.id} onClick={() => selectContact(contact)}>
-          {contact.name} ({contact.username})
-        </div>
-      ))}
+      {contacts.length > 0 ? (
+        contacts.map((contact) => (
+          <div key={contact.id} onClick={() => selectContact(contact)}>
+            {contact.name} ({contact.username})
+          </div>
+        ))
+      ) : (
+        <p>Nenhum contato encontrado.</p>
+      )}
     </div>
   );
 }

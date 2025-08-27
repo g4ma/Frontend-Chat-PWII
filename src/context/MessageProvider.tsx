@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import type { Message } from "../interfaces/Message";
 import { MessageContext } from "./MessageContext";
 import type { Socket } from "socket.io-client";
+import { cacheMessages, getCachedMessages } from "../utils/storage";
 
 export function MessageProvider({
   children,
@@ -10,7 +11,9 @@ export function MessageProvider({
   children: ReactNode;
   socket: Socket;
 }) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() =>
+    getCachedMessages()
+  );
 
   const addMessage = (msg: Message) => {
     const exists = messages.some(
@@ -23,7 +26,9 @@ export function MessageProvider({
     );
     if (exists) return;
 
-    setMessages((prev) => [...prev, msg]);
+    const updated = [...messages, msg];
+    setMessages(updated);
+    cacheMessages(updated);
   };
 
   useEffect(() => {
@@ -31,11 +36,9 @@ export function MessageProvider({
 
     socket.on("receiveMessage", addMessage);
 
-    const cleanup = () => {
+    return () => {
       socket.off("receiveMessage", addMessage);
     };
-
-    return cleanup;
   }, [socket, messages]);
 
   return (
