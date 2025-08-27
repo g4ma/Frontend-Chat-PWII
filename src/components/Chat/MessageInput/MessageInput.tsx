@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { saveOfflineMessage } from "../../../utils/storage";
 import { Socket } from "socket.io-client";
+
 import Arrow from "../../../assets/arrow";
 import { InputDiv, SendButton, TextInput } from "./MessageInput.style";
 
@@ -10,18 +11,20 @@ interface Props {
   receiverId: number;
 }
 
-export function MessageInput({ socket, senderId, receiverId }: Props) {
+export default function MessageInput({ socket, senderId, receiverId }: Props) {
   const [text, setText] = useState("");
 
+  // Entra na sala do chat atual
   useEffect(() => {
     if (socket) {
       socket.emit("joinRoom", { userId: senderId, contactId: receiverId });
     }
   }, [socket, senderId, receiverId]);
 
+  // Envia mensagem
   function sendMessage() {
 
-    if (!text.trim()) return; // evita enviar mensagem vazia
+    if (!text.trim()) return;
 
     const message = { senderId, receiverId, text, createdAt: new Date() };
 
@@ -34,12 +37,13 @@ export function MessageInput({ socket, senderId, receiverId }: Props) {
     setText("");
   }
 
+  // Envia mensagem ao pressionar Enter (sem Shift)
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   }
-}
 
 
   return (

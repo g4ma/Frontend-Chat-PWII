@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
-
 import type { User } from "../../interfaces/User";
-
 import { useOfflineQueue } from "../../hooks/useOfflineQueue";
-
-import ChatWindow from "../../components/Chat/ChatWindow/ChatWindow";
-import ContactList from "../../components/ContactList/ContactList";
 import { useNavigate } from "react-router-dom";
-import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
-import { ChatArea, ChatDisplay, ChatSidebar, Logo, StatusDisplay } from "../../components";
-import SmallDot from "../../assets/smalldot";
+
+import { ChatAreaDisplay, ChatDisplay, ChatSidebarArea, ChatWindow, ContactList, Logo, NewChatSelector, StatusDisplay } from "../../components";
 import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
+import SmallDot from "../../assets/smalldot";
+
 
 const socket: Socket = io("http://localhost:3000");
+
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -43,7 +40,7 @@ export default function ChatPage() {
         <div>loading</div>
       ) : (
         <ChatDisplay>
-          <ChatSidebar>
+          <ChatSidebarArea>
             <StatusDisplay>
               {connected ? (
                 <>
@@ -72,8 +69,8 @@ export default function ChatPage() {
                 selectContact={setSelectedContact}
               />
             </ContactListWrapper>
-          </ChatSidebar>
-          <ChatArea>
+          </ChatSidebarArea>
+          <ChatAreaDisplay>
             {selectedContact ? (
               <ChatWindow
                 socket={socket}
@@ -83,7 +80,7 @@ export default function ChatPage() {
             ) : (
               <Logo fontSize="2rem" iconSize="50" />
             )}
-          </ChatArea>
+          </ChatAreaDisplay>
 
         </ChatDisplay>
       )}

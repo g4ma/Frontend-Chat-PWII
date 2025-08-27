@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ButtonGroup } from "./Home.style";
-import { Logo, MainDisplay, NavigateButton } from "../../components";
+import { Logo, MainDisplay,  } from "../../components";
+import LinkButton from "../../components/Auth/LinkButton/linkButton";
 
 export function Home() {
   const navigate = useNavigate();
@@ -18,8 +19,8 @@ export function Home() {
         <title>Chatbot UI</title>
         <Logo fontSize="3rem" iconSize="75"/>
         <ButtonGroup>
-          <NavigateButton link="/login" text="Login" />
-          <NavigateButton link="/signup" text="Registro" />
+          <LinkButton link="/login" text="Login" />
+          <LinkButton link="/signup" text="Registro" />
         </ButtonGroup>
       </MainDisplay>
   );

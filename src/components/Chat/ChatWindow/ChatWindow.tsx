@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
-
-import { MessageInput } from "../MessageInput/MessageInput";
 import { cacheMessages, getCachedMessages } from "../../../utils/storage";
 import type { Message } from "../../../interfaces/Message";
+
 import { MainDiv, MessageBubble, MessagesArea } from "./ChatWindow.style";
+import MessageInput from "../MessageInput/MessageInput";
 
 interface ChatWindowProps {
   socket: Socket;
@@ -22,6 +22,7 @@ export default function ChatWindow({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
 
+  // Formata a data para exibição
   function formatDate(fullDate: Date | string) {
     if (!fullDate) return "";
 
@@ -39,7 +40,7 @@ export default function ChatWindow({
 
   }
 
-  // Pega histórico de mensagens ao mudar de contato
+  // Buscar histórico de mensagens ao montar o componente ou mudar de contato
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -63,7 +64,7 @@ export default function ChatWindow({
     fetchMessages();
   }, [currentUserId, contactId]);
 
-  // Recebe novas mensagens via socket
+  // Receber mensagens em tempo real
   useEffect(() => {
     const handleReceive = (message: Message) => {
       if (
@@ -87,12 +88,12 @@ export default function ChatWindow({
     };
   }, [socket, currentUserId, contactId]);
 
-  // Scroll automático
+
+  // Scrollar mensagens quando uma nova chegar e estiver perto do fim
   useEffect(() => {
     const messagesArea = messagesAreaRef.current;
     if (!messagesArea || !messagesEndRef.current) return;
 
-    // Verifica se está quase no final
     const nearBottom =
       messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight <
       50;
@@ -106,7 +107,7 @@ export default function ChatWindow({
     <MainDiv>
       <MessagesArea ref={messagesAreaRef}>
         {messages.map((m, i) => (
-          <MessageBubble key={i} isSent={m.senderId === currentUserId}>
+          <MessageBubble key={i} $isSent={m.senderId === currentUserId}>
             <p>{m.text}</p>
             <span>
               {formatDate(m.createdAt ?? new Date())}

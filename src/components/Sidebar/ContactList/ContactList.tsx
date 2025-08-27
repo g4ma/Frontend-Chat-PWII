@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { User } from "../../interfaces/User";
+import type { User } from "../../../interfaces/User";
 import { ContactChatsContainer, ContactListContainer, NoContactsMessage, SearchBar } from "./ContactList.style";
-import ProfileIcon from "../../assets/profileIcon";
+import ProfileIcon from "../../../assets/profileIcon";
 import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
 
 interface ContactListProps {
@@ -15,9 +15,9 @@ export default function ContactList({
 }: ContactListProps) {
 
   const [contacts, setContacts] = useState<User[]>([]);
-
   const [search, setSearch] = useState("");
 
+  // Busca os contatos do usuário ao montar o componente
   useEffect(() => {
     async function getMyContact() {
       try {
@@ -42,8 +42,8 @@ export default function ContactList({
     getMyContact();
   }, [currentUserId]);
 
+  // Filtra os contatos com base na busca
   const normalizedSearch = search.replaceAll("@", "").toLowerCase();
-
   const filteredContacts = contacts.filter((contact) =>
     contact.name.toLowerCase().includes(normalizedSearch) ||
     contact.username.toLowerCase().includes(normalizedSearch)

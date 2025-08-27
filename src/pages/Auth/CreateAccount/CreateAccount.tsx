@@ -1,5 +1,4 @@
-import { MainDisplay, Logo } from "../../components";
-import { CreateAccountForm } from "../../components/Forms/CreateAccountForm/CreateAccountForm";
+import { MainDisplay, Logo, CreateAccountForm } from "../../../components";
 
 export function CreateAccount() {
   return (

@@ -6,6 +6,6 @@ interface InputProps {
   type?: string;
 }
 
-export function Input({ name, placeholder, type }: InputProps) {
+export default function Input({ name, placeholder, type }: InputProps) {
   return <TextInput type={type || "text"} name={name} placeholder={placeholder} />;
 }

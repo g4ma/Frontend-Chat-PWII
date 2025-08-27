@@ -1,21 +1,39 @@
-import ChatArea from "./ChatArea/ChatArea";
-import ChatDisplay from "./ChatDisplay/ChatDisplay";
-import ChatSidebar from "./ChatSidebar/ChatSidebar";
-import { ContactButton, ContactUsername } from "./ContactButton/ContactButton.style";
+import Button from "./Auth/Forms/Button/Button";
+import ChatAreaDisplay from "./Chat/ChatAreaDisplay/ChatAreaDisplay";
+import ChatDisplay from "./Chat/ChatDisplay/ChatDisplay";
+import ChatSidebarArea from "./Sidebar/ChatSidebarArea/ChatSidebarArea";
+import ChatWindow from "./Chat/ChatWindow/ChatWindow";
+import ContactList from "./Sidebar/ContactList/ContactList";
+import { ContactButton, ContactUsername } from "./Sidebar/ContactButton/ContactButton.style";
+import CreateAccountForm from "./Auth/Forms/CreateAccountForm/CreateAccountForm";
+import Form from "./Auth/Forms/Form/Form";
+import Input from "./Auth/Forms/Input/Input";
+import LinkButton from "./Auth/LinkButton/linkButton";
+import LoginForm from "./Auth/Forms/LoginForm/LoginForm";
 import Logo from "./Logo/logo";
-import MainDisplay from "./MainDisplay/MainDisplay";
-import NavigateButton from "./NavigateButton/navigateButton";
-import StatusDisplay from "./StatusDisplay/StatusDisplay";
+import MainDisplay from "./Auth/MainDisplay/MainDisplay";
+import MessageInput from "./Chat/MessageInput/MessageInput";
+import NewChatSelector from "./Sidebar/NewChatSelector/NewChatSelector";
+import StatusDisplay from "./Sidebar/StatusDisplay/StatusDisplay";
 
 
 export {
-    ContactButton,
-    ContactUsername,
-    ChatArea,
+    Button,
+    ChatAreaDisplay,
     ChatDisplay,
-    ChatSidebar,
+    ChatSidebarArea,
+    ChatWindow,
+    ContactButton,
+    ContactList,
+    ContactUsername,
+    CreateAccountForm,
+    Form,
+    Input,
+    LinkButton,
+    LoginForm,
     Logo,
     MainDisplay,
-    NavigateButton,
+    MessageInput,
+    NewChatSelector,
     StatusDisplay,
 }

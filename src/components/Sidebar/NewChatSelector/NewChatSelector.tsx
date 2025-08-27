@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import type { User } from "../../interfaces/User";
-import ProfileIcon from "../../assets/profileIcon";
 import { List, NewChatButton } from "./NewChatSelector.style";
+import type { User } from "../../../interfaces/User";
+
 import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
+import ProfileIcon from "../../../assets/profileIcon";
 
 interface NewChatSelectorProps {
   currentUserId: number;
@@ -18,10 +19,13 @@ export default function NewChatSelector({
   const [users, setUsers] = useState<User[]>([]);
   const [open, setOpen] = useState(false);
 
+  // Avisa o componente pai quando o estado 'open' mudar
   useEffect(() => {
-    onToggleOpen(open); // 👈 avisa o pai
+    onToggleOpen(open);
   }, [open, onToggleOpen]);
 
+
+  // Busca usuários quando o seletor é aberto
   useEffect(() => {
     if (!open) return;
 
