@@ -29,6 +29,47 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
+async function subscribeToPushNotification(receiverId: number){
+  const subscriptionLS = localStorage.getItem("subscription");
+
+  if ("serviceWorker" in navigator && !subscriptionLS){
+    const registration = await navigator.serviceWorker.register('/sw.js')
+    
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
+    })
+
+    localStorage.setItem("subscription", JSON.stringify(subscription));
+
+    await fetch("http://localhost:3000/notification/subscribe", {
+      method: "POST",
+      body: JSON.stringify({
+        subscription,
+        receiverId,
+      }),
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+}
+
+// Pra quando for fazer logout
+async function unsubscribeToPushNotification(receiverId: number) {
+  const subscriptionLS = localStorage.getItem("subscription");
+  if (subscriptionLS){
+    const subscription = JSON.parse(subscriptionLS);
+    await fetch("http://localhost:3000/notification/unsubscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription,
+        receiverId,
+      }),
+    });
+  }
+}
+
+
 export default function ChatPage() {
   const navigate = useNavigate();
 
@@ -51,26 +92,6 @@ export default function ChatPage() {
   }, [navigate]);
 
   useEffect(() => {
-    async function subscribeToPushNotification(receiverId: number){
-      if ("serviceWorker" in navigator){
-        const registration = await navigator.serviceWorker.register('/sw.js')
-        
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
-        })
-
-        await fetch("http://localhost:3000/notification/subscribe", {
-          method: "POST",
-          body: JSON.stringify({
-            subscription,
-            receiverId,
-          }),
-          headers: { "Content-Type": "application/json" },
-        })
-      }
-    }
-
     if (userId !== null){
       subscribeToPushNotification(userId);
     }
