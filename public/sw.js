@@ -1,5 +1,6 @@
 let lastNotificationData = null;
 
+// Push notifications
 self.addEventListener('push', event => {
   const data = event.data?.json() || {};
 
@@ -12,7 +13,7 @@ self.addEventListener('push', event => {
         
         return self.registration.showNotification(data.title || "New message", {
           body: data.body || "You have a new chat message",
-          icon: "/icon.png",
+          icon: "/icon-192x192.png",
           data
         });
       }
@@ -54,4 +55,34 @@ self.addEventListener("message", event => {
       lastNotificationData = null;
     }
   }
+});
+
+// Cache offline de arquivos estáticos
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('static-cache-v1').then(cache => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/app.css',
+        '/vite.svg',
+        '/icon-192x192.png',
+        '/icon-512x512.png'
+      ])
+    })
+  )
+});
+
+// Limpar caches antigos
+self.addEventListener('activate', event => {
+  const cacheWhitelist = ['static-cache-v1'];
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(key => {
+        if (!cacheWhitelist.includes(key)) {
+          return caches.delete(key);
+        }
+      })
+    ))
+  );
 });
