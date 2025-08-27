@@ -11,7 +11,7 @@ import SmallDot from "../../assets/smalldot";
 
 const socket: Socket = io("http://localhost:3000");
 const PUBLIC_VAPID = "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg"
-  
+
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -28,12 +28,12 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-async function subscribeToPushNotification(receiverId: number){
+async function subscribeToPushNotification(receiverId: number) {
   const subscriptionLS = localStorage.getItem("subscription");
 
-  if ("serviceWorker" in navigator && !subscriptionLS){
+  if ("serviceWorker" in navigator && !subscriptionLS) {
     const registration = await navigator.serviceWorker.register('/sw.js')
-    
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
@@ -55,7 +55,7 @@ async function subscribeToPushNotification(receiverId: number){
 // Pra quando for fazer logout
 async function unsubscribeToPushNotification(receiverId: number) {
   const subscriptionLS = localStorage.getItem("subscription");
-  if (subscriptionLS){
+  if (subscriptionLS) {
     const subscription = JSON.parse(subscriptionLS);
     await fetch("http://localhost:3000/notification/unsubscribe", {
       method: "POST",
@@ -73,7 +73,7 @@ async function unsubscribeToPushNotification(receiverId: number) {
 export default function ChatPage() {
   const navigate = useNavigate();
 
-  const [connected, setConnected] = useState(socket.connected);
+  const [connected, setConnected] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
@@ -81,6 +81,7 @@ export default function ChatPage() {
   useOfflineQueue(socket);
 
   useEffect(() => {
+
     const storedUserId = localStorage.getItem("userId");
     if (!storedUserId) {
       navigate("/", { replace: true });
@@ -88,16 +89,17 @@ export default function ChatPage() {
       setUserId(parseInt(storedUserId));
     }
 
-    socket.on("connect", () => setConnected(true));
-    socket.on("disconnect", () => setConnected(false));
+    window.addEventListener("online", () => setConnected(true));
+    window.addEventListener("offline", () => setConnected(false));
+
   }, [navigate]);
 
   useEffect(() => {
-    if (userId !== null){
+    if (userId !== null) {
       subscribeToPushNotification(userId);
     }
   }, [userId])
-  
+
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener("message", (event) => {
@@ -106,7 +108,7 @@ export default function ChatPage() {
           setSelectedContact({ name: "", username: "", password: "", id: msg.chatId });
         }
       });
-  
+
       navigator.serviceWorker.ready.then(reg => {
         if (reg.active) {
           reg.active.postMessage({ type: "REQUEST_NOTIFICATION_DATA" });
@@ -115,9 +117,7 @@ export default function ChatPage() {
     }
   }, []);
 
-  Notification.requestPermission().then((result) => {
-    console.log(result);
-  });
+  Notification.requestPermission();
 
   return (
     <>
