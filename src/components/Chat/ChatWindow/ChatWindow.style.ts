@@ -13,7 +13,7 @@ export const MainDiv = styled.div`
 
 export const MessagesArea = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     gap: 10px;
     overflow-y: auto;
     flex: 1;
@@ -30,6 +30,7 @@ export const MessageBubble = styled.div<{ $isSent: boolean }>`
     padding: 10px 15px;
     border-radius: ${(props) => (props.$isSent ? "10px 0px 10px 10px" : "0px 10px 10px 10px")};
     max-width: 60%;
+    min-width: 8%;
     word-wrap: break-word;
     color: #111111ff;
     font-size: .9rem;

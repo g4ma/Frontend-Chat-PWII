@@ -89,24 +89,18 @@ export default function ChatWindow({
   }, [socket, currentUserId, contactId]);
 
 
-  // Scrollar mensagens quando uma nova chegar e estiver perto do fim
+  // Scrollar mensagens para a mais recente quando uma nova chegar
   useEffect(() => {
-    const messagesArea = messagesAreaRef.current;
-    if (!messagesArea || !messagesEndRef.current) return;
+  const messagesArea = messagesAreaRef.current;
+  if (!messagesArea) return;
 
-    const nearBottom =
-      messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight <
-      50;
-
-    if (nearBottom) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
+  messagesArea.scrollTop = 0;
+}, [messages]);
 
   return (
     <MainDiv>
       <MessagesArea ref={messagesAreaRef}>
-        {messages.map((m, i) => (
+        {[...messages].reverse().map((m, i) => (
           <MessageBubble key={i} $isSent={m.senderId === currentUserId}>
             <p>{m.text}</p>
             <span>
