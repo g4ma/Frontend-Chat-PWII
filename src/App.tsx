@@ -1,24 +1,22 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import { Home } from "./pages/Home/Home";
+import { CreateAccount } from "./pages/Auth/CreateAccount/CreateAccount";
+import { Login } from "./pages/Auth/Login/Login";
 import ChatPage from "./pages/Chat/ChatPage";
-import { CreateAccount } from "./pages/CreateAccount/CreateAccount";
 
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Login</Link>
-        <Link to="/singup">Sign Up</Link>
-        <Link to="/chat">Chat</Link>
-      </nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<CreateAccount />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
     </Router>
+    
   );
 }
 

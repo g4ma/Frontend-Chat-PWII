@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Socket } from "socket.io-client";
-
-import { MessageInput } from "../MessageInput/MissageInput";
 import { cacheMessages, getCachedMessages } from "../../../utils/storage";
 import type { Message } from "../../../interfaces/Message";
+
+import { MainDiv, MessageBubble, MessagesArea } from "./ChatWindow.style";
+import MessageInput from "../MessageInput/MessageInput";
 
 interface ChatWindowProps {
   socket: Socket;
@@ -16,8 +17,30 @@ export default function ChatWindow({
   currentUserId,
   contactId,
 }: ChatWindowProps) {
-  const [messages, setMessages] = useState<Message[]>(getCachedMessages());
 
+  const [messages, setMessages] = useState<Message[]>(getCachedMessages());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
+
+  // Formata a data para exibição
+  function formatDate(fullDate: Date | string) {
+    if (!fullDate) return "";
+
+    const date = new Date(fullDate);
+    const formattedDate = `${date.getHours().toString().padStart(2, '0')}:${date
+      .getMinutes()
+      .toString()
+      .padStart(2, '0')} ${date.getDate().toString().padStart(2, '0')}/${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+
+    return formattedDate;
+
+  }
+
+  // Buscar histórico de mensagens ao montar o componente ou mudar de contato
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -29,7 +52,7 @@ export default function ChatWindow({
           throw new Error(`Erro ao buscar mensagens: ${response.status}`);
         }
 
-        const data = await response.json();
+        const data: Message[] = await response.json();
 
         setMessages(data);
         cacheMessages(data);
@@ -41,12 +64,14 @@ export default function ChatWindow({
     fetchMessages();
   }, [currentUserId, contactId]);
 
+  // Receber mensagens em tempo real
   useEffect(() => {
-    function handleReceive(message: Message) {
+    const handleReceive = (message: Message) => {
       if (
         (message.senderId === contactId &&
           message.receiverId === currentUserId) ||
-        (message.senderId === currentUserId && message.receiverId === contactId)
+        (message.senderId === currentUserId &&
+          message.receiverId === contactId)
       ) {
         setMessages((prev) => {
           const updated = [...prev, message];
@@ -54,30 +79,43 @@ export default function ChatWindow({
           return updated;
         });
       }
-    }
+    };
 
     socket.on("receiveMessage", handleReceive);
+
     return () => {
       socket.off("receiveMessage", handleReceive);
     };
   }, [socket, currentUserId, contactId]);
 
+
+  // Scrollar mensagens para a mais recente quando uma nova chegar
+  useEffect(() => {
+  const messagesArea = messagesAreaRef.current;
+  if (!messagesArea) return;
+
+  messagesArea.scrollTop = 0;
+}, [messages]);
+
   return (
-    <div>
-      <div>
-        {messages.map((m, i) => (
-          <p key={i}>
-            {m.senderId === currentUserId ? "eu: " : "você: "}
-            {m.text}
-          </p>
+    <MainDiv>
+      <MessagesArea ref={messagesAreaRef}>
+        {[...messages].reverse().map((m, i) => (
+          <MessageBubble key={i} $isSent={m.senderId === currentUserId}>
+            <p>{m.text}</p>
+            <span>
+              {formatDate(m.createdAt ?? new Date())}
+            </span>
+          </MessageBubble>
         ))}
-      </div>
+        <div ref={messagesEndRef} />
+      </MessagesArea>
 
       <MessageInput
         socket={socket}
         senderId={currentUserId}
         receiverId={contactId}
       />
-    </div>
+    </MainDiv>
   );
 }

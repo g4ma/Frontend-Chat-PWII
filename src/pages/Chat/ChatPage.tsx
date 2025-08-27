@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
-
 import type { User } from "../../interfaces/User";
-
 import { useOfflineQueue } from "../../hooks/useOfflineQueue";
-
-import ChatWindow from "../../components/Chat/ChatWindow/ChatWindow";
-import ContactList from "../../components/ContactList/ContactList";
 import { useNavigate } from "react-router-dom";
-import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
+
+import { ChatAreaDisplay, ChatDisplay, ChatSidebarArea, ChatWindow, ContactList, Logo, NewChatSelector, StatusDisplay } from "../../components";
+import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
+import SmallDot from "../../assets/smalldot";
+
 
 const socket: Socket = io("http://localhost:3000");
 const PUBLIC_VAPID = "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg"
@@ -70,12 +69,14 @@ async function unsubscribeToPushNotification(receiverId: number) {
 }
 
 
+
 export default function ChatPage() {
   const navigate = useNavigate();
 
   const [connected, setConnected] = useState(socket.connected);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
+  const [showNewChat, setShowNewChat] = useState(false);
 
   useOfflineQueue(socket);
 
@@ -123,28 +124,52 @@ export default function ChatPage() {
       {userId === null ? (
         <div>loading</div>
       ) : (
-        <div style={{ display: "flex" }}>
-          <div style={{ width: "200px" }}>
-            <h3>{connected ? "Online" : "Offline"}</h3>
-            <ContactList
-              currentUserId={userId}
-              selectContact={setSelectedContact}
-            />
+        <ChatDisplay>
+          <title>Conversas - Chatbot UI</title>
+          <ChatSidebarArea>
+            <StatusDisplay>
+              {connected ? (
+                <>
+                  <StatusTitle>
+                    Online
+                  </StatusTitle>
+                  <SmallDot size="13" color="#4caf50" />
+                </>
+              ) : (
+                <>
+                  <StatusTitle>
+                    Offline
+                  </StatusTitle>
+                  <SmallDot size="13" color="#918f8fff" />
+                </>
+              )}
+            </StatusDisplay>
             <NewChatSelector
               currentUserId={userId}
               onSelect={setSelectedContact}
+              onToggleOpen={setShowNewChat}
             />
-          </div>
-          <div style={{ flex: 1 }}>
-            {selectedContact && (
+            <ContactListWrapper $hidden={showNewChat}>
+              <ContactList
+                currentUserId={userId}
+                selectContact={setSelectedContact}
+                selectedContactId={selectedContact?.id ?? null}
+              />
+            </ContactListWrapper>
+          </ChatSidebarArea>
+          <ChatAreaDisplay>
+            {selectedContact ? (
               <ChatWindow
                 socket={socket}
                 currentUserId={userId}
                 contactId={selectedContact.id}
               />
+            ) : (
+              <Logo fontSize="2rem" iconSize="50" />
             )}
-          </div>
-        </div>
+          </ChatAreaDisplay>
+
+        </ChatDisplay>
       )}
     </>
   );
