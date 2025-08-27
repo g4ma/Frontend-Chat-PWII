@@ -11,6 +11,64 @@ import { useNavigate } from "react-router-dom";
 import NewChatSelector from "../../components/NewChatSelector/NewChatSelector";
 
 const socket: Socket = io("http://localhost:3000");
+const PUBLIC_VAPID = "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg"
+  
+
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+async function subscribeToPushNotification(receiverId: number){
+  const subscriptionLS = localStorage.getItem("subscription");
+
+  if ("serviceWorker" in navigator && !subscriptionLS){
+    const registration = await navigator.serviceWorker.register('/sw.js')
+    
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
+    })
+
+    localStorage.setItem("subscription", JSON.stringify(subscription));
+
+    await fetch("http://localhost:3000/notification/subscribe", {
+      method: "POST",
+      body: JSON.stringify({
+        subscription,
+        receiverId,
+      }),
+      headers: { "Content-Type": "application/json" },
+    })
+  }
+}
+
+// Pra quando for fazer logout
+async function unsubscribeToPushNotification(receiverId: number) {
+  const subscriptionLS = localStorage.getItem("subscription");
+  if (subscriptionLS){
+    const subscription = JSON.parse(subscriptionLS);
+    await fetch("http://localhost:3000/notification/unsubscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription,
+        receiverId,
+      }),
+    });
+  }
+}
+
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -32,6 +90,33 @@ export default function ChatPage() {
     socket.on("connect", () => setConnected(true));
     socket.on("disconnect", () => setConnected(false));
   }, [navigate]);
+
+  useEffect(() => {
+    if (userId !== null){
+      subscribeToPushNotification(userId);
+    }
+  }, [userId])
+  
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data?.type === "NEW_PUSH_DATA") {
+          const msg = event.data.payload;
+          setSelectedContact({ name: "", username: "", password: "", id: msg.chatId });
+        }
+      });
+  
+      navigator.serviceWorker.ready.then(reg => {
+        if (reg.active) {
+          reg.active.postMessage({ type: "REQUEST_NOTIFICATION_DATA" });
+        }
+      });
+    }
+  }, []);
+
+  Notification.requestPermission().then((result) => {
+    console.log(result);
+  });
 
   return (
     <>
