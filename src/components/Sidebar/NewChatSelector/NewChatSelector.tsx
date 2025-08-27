@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { List, NewChatButton } from "./NewChatSelector.style";
 import type { User } from "../../../interfaces/User";
 
-import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
+import { ContactButton, ContactText, ContactUsername } from "../ContactButton/ContactButton.style";
 import ProfileIcon from "../../../assets/profileIcon";
 
 interface NewChatSelectorProps {
@@ -66,7 +66,9 @@ export default function NewChatSelector({
               }}
             >
               <ProfileIcon size="25" />
-              {user.name} <ContactUsername>(@{user.username})</ContactUsername>
+              <ContactText>
+                {user.name} <ContactUsername>(@{user.username})</ContactUsername>
+              </ContactText>
             </ContactButton>
           </li>
         ))}

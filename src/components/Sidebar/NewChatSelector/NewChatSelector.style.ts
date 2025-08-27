@@ -32,7 +32,7 @@ export const List = styled.ul`
     transition: max-height 0.5s linear , opacity 0.2s linear;   
     
     &.open {
-        max-height: 300px;
+        max-height: 100%;
         opacity: 1;
     }   
     li {

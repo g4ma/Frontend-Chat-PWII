@@ -4,7 +4,7 @@ import ChatDisplay from "./Chat/ChatDisplay/ChatDisplay";
 import ChatSidebarArea from "./Sidebar/ChatSidebarArea/ChatSidebarArea";
 import ChatWindow from "./Chat/ChatWindow/ChatWindow";
 import ContactList from "./Sidebar/ContactList/ContactList";
-import { ContactButton, ContactUsername } from "./Sidebar/ContactButton/ContactButton.style";
+import { ContactButton, ContactUsername, ContactText } from "./Sidebar/ContactButton/ContactButton.style";
 import CreateAccountForm from "./Auth/Forms/CreateAccountForm/CreateAccountForm";
 import Form from "./Auth/Forms/Form/Form";
 import Input from "./Auth/Forms/Input/Input";
@@ -25,6 +25,7 @@ export {
     ChatWindow,
     ContactButton,
     ContactList,
+    ContactText,
     ContactUsername,
     CreateAccountForm,
     Form,

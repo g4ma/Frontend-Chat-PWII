@@ -67,6 +67,7 @@ export default function ChatPage() {
               <ContactList
                 currentUserId={userId}
                 selectContact={setSelectedContact}
+                selectedContactId={selectedContact?.id ?? null}
               />
             </ContactListWrapper>
           </ChatSidebarArea>

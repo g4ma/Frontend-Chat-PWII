@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import type { User } from "../../../interfaces/User";
 import { ContactChatsContainer, ContactListContainer, NoContactsMessage, SearchBar } from "./ContactList.style";
 import ProfileIcon from "../../../assets/profileIcon";
-import { ContactButton, ContactUsername } from "../ContactButton/ContactButton.style";
+import { ContactButton, ContactText, ContactUsername } from "../ContactButton/ContactButton.style";
 
 interface ContactListProps {
   currentUserId: number;
   selectContact: (contact: User) => void;
+  selectedContactId: number | null;
 }
 
 export default function ContactList({
   currentUserId,
   selectContact,
+  selectedContactId
 }: ContactListProps) {
 
   const [contacts, setContacts] = useState<User[]>([]);
@@ -63,9 +65,15 @@ export default function ContactList({
           <ContactButton
             key={contact.id}
             onClick={() => selectContact(contact)}
+            $isActive={selectedContactId === contact.id}
           >
             <ProfileIcon size="25" />
-            {contact.name} <ContactUsername>(@{contact.username})</ContactUsername>
+            <ContactText>
+              {contact.name}
+              <ContactUsername>
+                (@{contact.username})
+              </ContactUsername>
+            </ContactText>
           </ContactButton>
         ))}
         {filteredContacts.length === 0 && <NoContactsMessage>Nenhuma conversa encontrada</NoContactsMessage>}

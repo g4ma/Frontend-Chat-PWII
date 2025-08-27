@@ -7,7 +7,7 @@ export const MainDiv = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: flex-start; 
-    min-height: 100vh;
+    height: 100vh;
     max-height: 100vh;
     background: #0A0A0A;
     padding: 20px 0;
