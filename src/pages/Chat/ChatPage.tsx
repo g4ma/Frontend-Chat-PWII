@@ -40,6 +40,7 @@ export default function ChatPage() {
         <div>loading</div>
       ) : (
         <ChatDisplay>
+          <title>Conversas - Chatbot UI</title>
           <ChatSidebarArea>
             <StatusDisplay>
               {connected ? (
