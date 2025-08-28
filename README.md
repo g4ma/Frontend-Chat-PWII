@@ -1,69 +1,46 @@
-# React + TypeScript + Vite
+# Aplicação webchat - Programação para web II 2025.1
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Sumário
 
-Currently, two official plugins are available:
+- [Equipe](#equipe)
+- [Descrição da Atividade](#descrição-da-atividade)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Executando o projeto](#executando-o-projeto)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## Equipe
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Gabriella](https://github.com/gabs44)
+- [Maria Clara](https://github.com/marysclair)
+- [Maurício](https://github.com/maueici0)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Descrição da Atividade
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+Este repositório contém o frontend da aplicação WebChat, desenvolvida como parte da disciplina de Programação para Web II, com o objetivo de demonstrar na prática os principais conceitos estudados. O backend dessa aplicação pode ser acessado [aqui](https://github.com/g4ma/Backend-Chat-PWII)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Funcionalidades do Frontend
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+O frontend do WebChat permite que o usuário:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Crie e gerencie conversas com diferentes contatos.
+- Envie e receba mensagens em tempo real, graças ao WebSocket.
+- Receba notificações mesmo quando a aplicação não está aberta, com redirecionamento direto para a conversa específica.
+- Visualize mensagens anteriores mesmo sem conexão com a internet, graças ao cache gerenciado pelos Service Workers.
+- Navegue entre diferentes chats de forma dinâmica
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Tecnologias Utilizadas
+
+O projeto foi desenvolvido utilizando ReactJS como framework principal para construção da interface. A linguagem escolhida foi o TypeScript, que oferece tipagem estática e maior segurança no desenvolvimento em comparação ao JavaScript puro. Para a estilização dos componentes foi adotado o Styled Components, possibilitando uma abordagem modular e organizada do CSS dentro do próprio código.
+
+A comunicação em tempo real foi implementada por meio do protocolo WebSocket, permitindo o envio e recebimento instantâneo de mensagens. Além disso, foram aplicadas Push Notifications utilizando a Notification API em conjunto com Service Workers, responsáveis por exibir alertas mesmo quando a aplicação não está em foco.
+
+## Executando o projeto
+
+Para executar este projeto, execute os seguintes passos:
+
+1. Instale as dependências do Node.js com
+ `npm i`
+
+2. Execute `npm run dev` para iniciar o servidor
+
+3. Abra o navegador em `http://localhost:5173`
