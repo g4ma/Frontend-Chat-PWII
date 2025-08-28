@@ -4,14 +4,22 @@ import type { User } from "../../interfaces/User";
 import { useOfflineQueue } from "../../hooks/useOfflineQueue";
 import { useNavigate } from "react-router-dom";
 
-import { ChatAreaDisplay, ChatDisplay, ChatSidebarArea, ChatWindow, ContactList, Logo, NewChatSelector, StatusDisplay } from "../../components";
+import {
+  ChatAreaDisplay,
+  ChatDisplay,
+  ChatSidebarArea,
+  ChatWindow,
+  ContactList,
+  Logo,
+  NewChatSelector,
+  StatusDisplay,
+} from "../../components";
 import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
 import SmallDot from "../../assets/smalldot";
 
-
 const socket: Socket = io("http://localhost:3000");
-const PUBLIC_VAPID = "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg"
-
+const PUBLIC_VAPID =
+  "BE3CpnkxOYj-pAs3_jx8kpXR9KaGNWxRIFEawedp4rMyeOdxxrwbErES2H_fDvL9n_pXNSXLfPy-WOW6Memzckg";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -32,12 +40,12 @@ async function subscribeToPushNotification(receiverId: number) {
   const subscriptionLS = localStorage.getItem("subscription");
 
   if ("serviceWorker" in navigator && !subscriptionLS) {
-    const registration = await navigator.serviceWorker.register('/sw.js')
+    const registration = await navigator.serviceWorker.register("/sw.js");
 
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID)
-    })
+      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID),
+    });
 
     localStorage.setItem("subscription", JSON.stringify(subscription));
 
@@ -48,7 +56,7 @@ async function subscribeToPushNotification(receiverId: number) {
         receiverId,
       }),
       headers: { "Content-Type": "application/json" },
-    })
+    });
   }
 }
 
@@ -68,48 +76,64 @@ async function unsubscribeToPushNotification(receiverId: number) {
   }
 }
 
-
-
 export default function ChatPage() {
   const navigate = useNavigate();
 
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(navigator.onLine);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
 
-  useOfflineQueue(socket);
+  useOfflineQueue(connected, socket);
 
   useEffect(() => {
+    function connect() {
+      setConnected(true);
+    }
 
+    function desconnect() {
+      setConnected(false);
+    }
+
+    window.addEventListener("online", connect);
+    window.addEventListener("offline", desconnect);
+
+    return () => {
+      window.removeEventListener("online", connect);
+      window.removeEventListener("offline", desconnect);
+    };
+  }, []);
+
+  useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
     if (!storedUserId) {
       navigate("/", { replace: true });
     } else {
       setUserId(parseInt(storedUserId));
     }
-
-    window.addEventListener("online", () => setConnected(true));
-    window.addEventListener("offline", () => setConnected(false));
-
   }, [navigate]);
 
   useEffect(() => {
     if (userId !== null) {
       subscribeToPushNotification(userId);
     }
-  }, [userId])
+  }, [userId]);
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
+    if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data?.type === "NEW_PUSH_DATA") {
           const msg = event.data.payload;
-          setSelectedContact({ name: "", username: "", password: "", id: msg.chatId });
+          setSelectedContact({
+            name: "",
+            username: "",
+            password: "",
+            id: msg.chatId,
+          });
         }
       });
 
-      navigator.serviceWorker.ready.then(reg => {
+      navigator.serviceWorker.ready.then((reg) => {
         if (reg.active) {
           reg.active.postMessage({ type: "REQUEST_NOTIFICATION_DATA" });
         }
@@ -130,16 +154,12 @@ export default function ChatPage() {
             <StatusDisplay>
               {connected ? (
                 <>
-                  <StatusTitle>
-                    Online
-                  </StatusTitle>
+                  <StatusTitle>Online</StatusTitle>
                   <SmallDot size="13" color="#4caf50" />
                 </>
               ) : (
                 <>
-                  <StatusTitle>
-                    Offline
-                  </StatusTitle>
+                  <StatusTitle>Offline</StatusTitle>
                   <SmallDot size="13" color="#918f8fff" />
                 </>
               )}
@@ -151,6 +171,7 @@ export default function ChatPage() {
             />
             <ContactListWrapper $hidden={showNewChat}>
               <ContactList
+                connected={connected}
                 currentUserId={userId}
                 selectContact={setSelectedContact}
                 selectedContactId={selectedContact?.id ?? null}
@@ -160,6 +181,7 @@ export default function ChatPage() {
           <ChatAreaDisplay>
             {selectedContact ? (
               <ChatWindow
+                connected={connected}
                 socket={socket}
                 currentUserId={userId}
                 contactId={selectedContact.id}
@@ -168,7 +190,6 @@ export default function ChatPage() {
               <Logo fontSize="2rem" iconSize="50" />
             )}
           </ChatAreaDisplay>
-
         </ChatDisplay>
       )}
     </>

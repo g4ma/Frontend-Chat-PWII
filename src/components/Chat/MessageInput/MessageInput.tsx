@@ -23,7 +23,6 @@ export default function MessageInput({ socket, senderId, receiverId }: Props) {
 
   // Envia mensagem
   function sendMessage() {
-
     if (!text.trim()) return;
 
     const message = { senderId, receiverId, text, createdAt: new Date() };
@@ -44,7 +43,6 @@ export default function MessageInput({ socket, senderId, receiverId }: Props) {
       sendMessage();
     }
   }
-
 
   return (
     <InputDiv>
