@@ -16,6 +16,7 @@ import {
 } from "../../components";
 import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
 import SmallDot from "../../assets/smalldot";
+import Logout from "../../components/Sidebar/Logout/Logout";
 
 const socket: Socket = io("http://localhost:3000");
 const PUBLIC_VAPID =
@@ -56,22 +57,6 @@ async function subscribeToPushNotification(receiverId: number) {
         receiverId,
       }),
       headers: { "Content-Type": "application/json" },
-    });
-  }
-}
-
-// Pra quando for fazer logout
-async function unsubscribeToPushNotification(receiverId: number) {
-  const subscriptionLS = localStorage.getItem("subscription");
-  if (subscriptionLS) {
-    const subscription = JSON.parse(subscriptionLS);
-    await fetch("http://localhost:3000/notification/unsubscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        subscription,
-        receiverId,
-      }),
     });
   }
 }
@@ -177,6 +162,7 @@ export default function ChatPage() {
                 selectedContactId={selectedContact?.id ?? null}
               />
             </ContactListWrapper>
+            <Logout />
           </ChatSidebarArea>
           <ChatAreaDisplay>
             {selectedContact ? (
