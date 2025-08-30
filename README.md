@@ -4,6 +4,7 @@
 
 - [Equipe](#equipe)
 - [Descrição da Atividade](#descrição-da-atividade)
+- [Funcionalidades do Frontend](#funcionalidades-do-frontend)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Executando o projeto](#executando-o-projeto)
 
