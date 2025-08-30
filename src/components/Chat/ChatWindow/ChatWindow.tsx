@@ -5,14 +5,13 @@ import type { Message } from "../../../interfaces/Message";
 
 import { MainDiv, MessageBubble, MessagesArea } from "./ChatWindow.style";
 import MessageInput from "../MessageInput/MessageInput";
-// import type { User } from "../../../interfaces/User";
 
 interface ChatWindowProps {
   socket: Socket;
   currentUserId: number;
   contactId: number;
   connected: boolean;
-  // setContacts: (user: User[]) => void;
+  refreshContacts: () => void;
 }
 
 export default function ChatWindow({
@@ -20,20 +19,18 @@ export default function ChatWindow({
   socket,
   currentUserId,
   contactId,
-}: // setContacts,
-ChatWindowProps) {
+  refreshContacts,
+}: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>(
     getCachedMessages(contactId)
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
 
-  // Formata a data para exibição
   function formatDate(fullDate: Date | string) {
     if (!fullDate) return "";
-
     const date = new Date(fullDate);
-    const formattedDate = `${date.getHours().toString().padStart(2, "0")}:${date
+    return `${date.getHours().toString().padStart(2, "0")}:${date
       .getMinutes()
       .toString()
       .padStart(2, "0")} ${date.getDate().toString().padStart(2, "0")}/${(
@@ -41,11 +38,8 @@ ChatWindowProps) {
     )
       .toString()
       .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`;
-
-    return formattedDate;
   }
 
-  // Buscar histórico de mensagens ao montar o componente ou mudar de contato
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -54,17 +48,12 @@ ChatWindowProps) {
           const response = await fetch(
             `http://localhost:3000/messages/history/${currentUserId}/${contactId}`
           );
-
-          if (!response.ok) {
-            throw new Error(`Erro ao buscar mensagens: ${response.status}`);
-          }
+          if (!response.ok) throw new Error(`Erro ao buscar mensagens`);
           data = await response.json();
         } else {
           data = getCachedMessages(contactId);
         }
-
         setMessages(data);
-
         cacheMessages(contactId, data);
       } catch (err) {
         console.error(err);
@@ -74,65 +63,30 @@ ChatWindowProps) {
     fetchMessages();
   }, [currentUserId, contactId, connected]);
 
-  // Receber mensagens em tempo real
   useEffect(() => {
-    const handleReceive = async (message: Message) => {
+    const handleReceive = (message: Message) => {
       if (
         (message.senderId === contactId &&
           message.receiverId === currentUserId) ||
         (message.senderId === currentUserId && message.receiverId === contactId)
       ) {
-        console.log(message);
         setMessages((prev) => {
           const updated = [...prev, message];
           cacheMessages(contactId, updated);
-          // cacheMessages(updated);
           return updated;
         });
       }
-
-      // const newContactId: number =
-      //   message.senderId === currentUserId
-      //     ? message.receiverId
-      //     : message.senderId;
-
-      // try {
-      //   const response = await fetch(
-      //     `http://localhost:3000/users/newchat/${currentUserId}`,
-      //     {
-      //       method: "GET",
-      //       headers: { "Content-Type": "application/json" },
-      //     }
-      //   );
-      //   if (!response.ok) throw new Error("Erro ao buscar usuários");
-      //   const allUsers: User[] = await response.json();
-
-      //   const user = allUsers.find((u) => u.id === newContactId);
-      //   if (user) {
-      //     setContacts((prev: User[]) => {
-      //       if (prev) {
-      //         return [...prev, user];
-      //       }
-      //       return [user];
-      //     });
-      //   }
-      // } catch (err) {
-      //   console.error(err);
-      // }
     };
 
     socket.on("receiveMessage", handleReceive);
-
     return () => {
       socket.off("receiveMessage", handleReceive);
     };
   }, [socket, currentUserId, contactId]);
 
-  // Scrollar mensagens para a mais recente quando uma nova chegar
   useEffect(() => {
     const messagesArea = messagesAreaRef.current;
     if (!messagesArea) return;
-
     messagesArea.scrollTop = 0;
   }, [messages]);
 
@@ -152,6 +106,7 @@ ChatWindowProps) {
         socket={socket}
         senderId={currentUserId}
         receiverId={contactId}
+        onSendMessage={refreshContacts}
       />
     </MainDiv>
   );

@@ -17,6 +17,7 @@ import {
 import { ContactListWrapper, StatusTitle } from "./ChatPage.style";
 import SmallDot from "../../assets/smalldot";
 import Logout from "../../components/Sidebar/Logout/Logout";
+import { getContacts, saveContacts } from "../../utils/storage";
 
 const socket: Socket = io("http://localhost:3000");
 const PUBLIC_VAPID =
@@ -25,7 +26,7 @@ const PUBLIC_VAPID =
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, "+")
+    .replace(/-/g, "+")
     .replace(/_/g, "/");
 
   const rawData = window.atob(base64);
@@ -68,8 +69,25 @@ export default function ChatPage() {
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedContact, setSelectedContact] = useState<User | null>(null);
   const [showNewChat, setShowNewChat] = useState(false);
+  const [contacts, setContacts] = useState<User[]>([]);
 
   useOfflineQueue(connected, socket);
+
+  async function refreshContacts() {
+    if (!userId) return;
+    try {
+      const response = await fetch(
+        `http://localhost:3000/messages/contacts/${userId}`
+      );
+      if (!response.ok) throw new Error("Erro ao buscar contatos");
+      const data: User[] = await response.json();
+      setContacts(data);
+      saveContacts(userId, data);
+    } catch {
+      const storedContacts = getContacts(userId);
+      setContacts(storedContacts);
+    }
+  }
 
   useEffect(() => {
     function connect() {
@@ -101,6 +119,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (userId !== null) {
       subscribeToPushNotification(userId);
+      refreshContacts();
     }
   }, [userId]);
 
@@ -160,6 +179,7 @@ export default function ChatPage() {
                 currentUserId={userId}
                 selectContact={setSelectedContact}
                 selectedContactId={selectedContact?.id ?? null}
+                contacts={contacts}
               />
             </ContactListWrapper>
             <Logout />
@@ -171,6 +191,7 @@ export default function ChatPage() {
                 socket={socket}
                 currentUserId={userId}
                 contactId={selectedContact.id}
+                refreshContacts={refreshContacts}
               />
             ) : (
               <Logo fontSize="2rem" iconSize="50" />
