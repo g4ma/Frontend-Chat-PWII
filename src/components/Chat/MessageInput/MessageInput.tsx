@@ -9,19 +9,23 @@ interface Props {
   socket: Socket | null;
   senderId: number;
   receiverId: number;
+  onSendMessage: () => void;
 }
 
-export default function MessageInput({ socket, senderId, receiverId }: Props) {
+export default function MessageInput({
+  socket,
+  senderId,
+  receiverId,
+  onSendMessage,
+}: Props) {
   const [text, setText] = useState("");
 
-  // Entra na sala do chat atual
   useEffect(() => {
     if (socket) {
       socket.emit("joinRoom", { userId: senderId, contactId: receiverId });
     }
   }, [socket, senderId, receiverId]);
 
-  // Envia mensagem
   function sendMessage() {
     if (!text.trim()) return;
 
@@ -34,9 +38,10 @@ export default function MessageInput({ socket, senderId, receiverId }: Props) {
     }
 
     setText("");
+
+    onSendMessage(); // Atualiza lista de contatos
   }
 
-  // Envia mensagem ao pressionar Enter (sem Shift)
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

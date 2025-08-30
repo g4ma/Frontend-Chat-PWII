@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { User } from "../../../interfaces/User";
 import {
   ContactChatsContainer,
@@ -12,59 +12,24 @@ import {
   ContactText,
   ContactUsername,
 } from "../ContactButton/ContactButton.style";
-import {
-  getCachedMessages,
-  getContacts,
-  saveContacts,
-} from "../../../utils/storage";
+import { getCachedMessages } from "../../../utils/storage";
 
 interface ContactListProps {
   currentUserId: number;
   selectContact: (contact: User) => void;
   selectedContactId: number | null;
   connected: boolean;
+  contacts: User[];
 }
 
 export default function ContactList({
   connected,
-  currentUserId,
   selectContact,
   selectedContactId,
+  contacts,
 }: ContactListProps) {
-  const [contacts, setContacts] = useState<User[]>([]);
   const [search, setSearch] = useState("");
 
-  // Busca os contatos do usuário ao montar o componente
-  useEffect(() => {
-    async function getMyContact() {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/messages/contacts/${currentUserId}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`Erro na requisição: ${response.status}`);
-        }
-
-        const data: User[] = await response.json();
-        setContacts(data);
-
-        saveContacts(currentUserId, data);
-      } catch {
-        console.warn(
-          "Sem conexão com o servidor, carregando contatos offline..."
-        );
-        const storedContacts = getContacts(currentUserId);
-        if (storedContacts.length > 0) {
-          setContacts(storedContacts);
-        }
-      }
-    }
-
-    getMyContact();
-  }, [currentUserId]);
-
-  // Filtra os contatos com base na busca
   const normalizedSearch = search.replaceAll("@", "").toLowerCase();
   const filteredContacts = contacts.filter(
     (contact) =>
