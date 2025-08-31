@@ -62,7 +62,7 @@ Decidimos aplicar estratégias de cache e armazenamento local (localStorage + Se
 
 ## Arquitetura
 
-![Arquitetura frontend](./dist/assets/Frontend.png)
+![Arquitetura frontend](./assets/Frontend.png)
 
 No frontend, a arquitetura é dividida em três partes principais: camada de interface (UI Layer), hooks e domínio.
 
